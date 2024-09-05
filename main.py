@@ -33,14 +33,18 @@ class ExpenseHandler:
 
     def add_expense(self, amount, description=None):
         date = self._date()
-        id = self.expense_id()
-        expense = f"{id},{date},{amount},{description}"
+        expense_id = self.expense_id()
+        expense = f"{expense_id},{date},{amount},{description}"
 
         try:
             with open("expense.csv", "a") as file:
                 file.write(f"{expense}\n")
+
+            print("Expense added successfully (ID: {})".format(expense_id))
         except IOError:
             print("Error adding expense.")
+
+        
 
     def delete_expense(self, id, expenses):
         updated_expense = list(filter(lambda x: x[0] != id, expenses))
@@ -104,8 +108,10 @@ class ExpenseHandler:
             # Formatting for better readability
             id = expense[0]
             date = expense[1]
-            amount = expense[2]
+            amount: str = expense[2]
             description = expense[3]
+            
+            amount = "$"+amount if not amount.isalpha() else amount
 
             s = f"{id.ljust(3, " ")}|{date.center(10, " ")}|{amount.center(10, " ")}|{description.rjust(12, " ")}"
             print(s)
@@ -146,7 +152,6 @@ def main():
     match command:
         case "add":
             expense_handler.add_expense(amount, description)
-            print("Expense added successfully.")
         case "delete":
             expense_handler.delete_expense(expense_id, expenses)
             print("Expense deleted successfully.")
